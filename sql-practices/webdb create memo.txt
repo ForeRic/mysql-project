@@ -1,0 +1,3 @@
+create database employee;
+create user 'employee'@'localhost' identified by 'employee';
+grant all privileges on employee.* to 'employee'@'localhost';
