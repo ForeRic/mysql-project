@@ -38,9 +38,9 @@ select a.emp_no, b.first_name
 -- 예제2.
 -- 다중행인 경우 
 -- 현재 전제 사원의 평균 연봉보다 적은 급여를 받는 사원의 리므, 급여를 출력하시오. 
-select avg(salary)
-	from salaires
-    where to_date = '9999-01-01'; -- error: employees.salaires doesn't exist 
+select *
+	from salaries;
+    -- where to_date = '9999-01-01'; -- error: employees.salaires doesn't exist 
     
 select *
 	from 	salaries a, employees b
@@ -125,3 +125,25 @@ order by avg_salary asc limit 0,1; -- 처음에서 부터 딱 1개만 빼옴. 0:
 -- 힌트: 일단 부서별로 최고 급여를 구해야 함. if a부서 (dept_no) 최고 급여 (max_salary) 10원 b 는 20 c는 30 이라면 테이블 하나가 나오겠징? 
 -- 힌트를 from 절에다 넣고, 
 -- select emp_no, dept_no, salary from a,b,c( 이곳에서는 dept_no = abc dept_no, salary = abc min(salary) 
+
+-- sol 1
+select a.dept_no, max(b.salary) as max_salary -- group by 에 참여하고 있는 컬럼. 
+	from 	dept_emp a, salaries b
+    where 	a.emp_no = b.emp_no 
+    and 	a.to_date = '9999-01-01'
+    and 	b.to_date = '9999-01-01'
+group by 	a.dept_no; -- 부서별로. 
+
+-- sol 2 (from 절 subquery)
+select a.first_name, b.dept_no, d.dept_name, c.salary
+	from 	employees a, dept_emp b, salaries c, departments d, (select a.dept_no, max(b.salary) as max_salary 
+	from 	dept_emp a, salaries b
+    where 	a.emp_no = b.emp_no 
+    and 	a.to_date = '9999-01-01'
+    and 	b.to_date = '9999-01-01'
+group by 	a.dept_no) e  -- 부서별로. ) 
+    where 	a.emp_no = b.emp_no
+    and		b.emp_no = c.emp_no
+    and 	b.dept_no = d.dept_no
+    and 	b.to_date = '9999-01-01'
+    and 	c.to_date = '9999-01-01'
